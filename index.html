@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Seer CyLor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   body {
     background: linear-gradient(270deg, #0a0a0a, #001111, #0a0a0a);
@@ -12,6 +13,8 @@
     color: white;
     text-align: center;
     padding: 20px;
+    max-width: 480px;
+    margin: auto;
   }
   @keyframes gradientBG {
     0%{background-position:0% 50%}
@@ -31,6 +34,7 @@
     border-radius: 5px;
     box-shadow: 0 0 15px #0ff;
     animation: pulseBanner 2s infinite;
+    line-height: 1.5em;
   }
   @keyframes pulseBanner {
     0% { box-shadow: 0 0 10px #0ff; }
@@ -47,7 +51,7 @@
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   .response {
@@ -94,7 +98,6 @@
     transform: scale(1.5);
   }
 
-  /* Glitch keyframes */
   @keyframes glitchShift {
     0% { transform: translate(0,0); }
     20% { transform: translate(-2px,1px); }
@@ -115,7 +118,6 @@
     animation: glitchShift 0.2s linear 0s 2, glitchColor 0.2s linear 0s 2;
   }
 
-  /* Particle effects around orb */
   #particles {
     position: absolute;
     top: 50%;
@@ -141,29 +143,38 @@
 </style>
 </head>
 <body>
-  <div id="markerBanner">⚡ Transcranial Interlink Online. Your thoughts are being read. Concentrate. CyLor awaits. ⚡</div>
 
-  <h1>Seer CyLor</h1>
+<div id="markerBanner">
+  ⚡ Transcranial Interlink Online.<br>
+  Your thoughts are being read.<br>
+  Concentrate.<br>
+  CyLor awaits. ⚡
+</div>
 
-  <div class="toggle-row">
-    <label class="toggle-label">Gate Keeper Mode</label>
-    <input type="checkbox" id="gateToggle" />
-  </div>
+<h1>Seer CyLor</h1>
 
-  <button class="button" onclick="consultCyLor()">Consult CyLor</button>
+<div class="toggle-row">
+  <label class="toggle-label">Gate Keeper Mode</label>
+  <input type="checkbox" id="gateToggle" />
+</div>
 
-  <div style="position: relative; display: inline-block;">
-    <div class="orb" id="orb"></div>
-    <div id="particles"></div>
-  </div>
+<button class="button" onclick="consultCyLor()">Consult CyLor</button>
+<button class="button" onclick="resetCyLor()">Reset CyLor</button>
 
-  <div class="response" id="response">Consult the Seer...</div>
-  <div class="stats" id="stats"></div>
-  <div class="log" id="log"></div>
+<div style="position: relative; display: inline-block;">
+  <div class="orb" id="orb"></div>
+  <div id="particles"></div>
+</div>
+
+<div class="response" id="response">Consult the Seer...</div>
+<div class="stats" id="stats"></div>
+<div class="log" id="log"></div>
 
 <script>
 // Audio setup
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+document.body.addEventListener('click', ()=>{ if(audioCtx.state==='suspended') audioCtx.resume(); }, {once:true});
+
 function playTone(freq=440,dur=0.2,type='sine'){
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
@@ -269,7 +280,7 @@ function consultCyLor() {
   updateStats();
   updateLog();
 
-  playRandomTone(); // beep every click
+  playRandomTone(); 
 
   const gateMode = document.getElementById("gateToggle").checked;
   if(selected.category==="Glitch") playGlitchTone();
@@ -313,11 +324,7 @@ function triggerOrb() {
   orb.style.width="200px";
   orb.style.height="200px";
   triggerParticles();
-  setTimeout(()=>{
-    orb.classList.remove("active");
-    orb.style.width="0";
-    orb.style.height="0";
-  },1000);
+  setTimeout(()=>{ orb.classList.remove("active"); orb.style.width="0"; orb.style.height="0"; },1000);
 }
 
 function triggerGlitch(el,times=1){
@@ -344,7 +351,14 @@ function triggerParticles() {
   }
 }
 
-// Banner glitch
+function resetCyLor(){
+  for(const key in counts) counts[key]=0;
+  history=[]; log=[];
+  updateStats(); updateLog();
+  document.getElementById('response').textContent='Consult the Seer...';
+  document.getElementById('orb').classList.remove('active');
+}
+
 const banner=document.getElementById('markerBanner');
 setInterval(()=>{ triggerGlitch(banner); },3000+Math.random()*2000);
 
